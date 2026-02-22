@@ -11,6 +11,8 @@ KEY_REFRESH = "refresh"
 KEY_PATH = "path"
 KEY_SUBMODULES = "submodules"
 KEY_EXTRA_BUILD_FILES = "extra_build_files"
+KEY_EXCLUDE_COMPONENTS = "exclude_components"
+KEY_FULL_CERT_BUNDLE = "full_cert_bundle"
 
 VARIANT_ESP32 = "ESP32"
 VARIANT_ESP32S2 = "ESP32S2"

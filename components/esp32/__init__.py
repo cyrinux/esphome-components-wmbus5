@@ -46,7 +46,9 @@ from .const import (  # noqa
     KEY_BOARD,
     KEY_COMPONENTS,
     KEY_ESP32,
+    KEY_EXCLUDE_COMPONENTS,
     KEY_EXTRA_BUILD_FILES,
+    KEY_FULL_CERT_BUNDLE,
     KEY_PATH,
     KEY_REF,
     KEY_REPO,
@@ -175,12 +177,22 @@ def set_core_data(config):
     CORE.data[KEY_ESP32][KEY_VARIANT] = variant
     CORE.data[KEY_ESP32][KEY_EXTRA_BUILD_FILES] = {}
     CORE.data[KEY_ESP32][KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED] = False
+    CORE.data[KEY_ESP32][KEY_EXCLUDE_COMPONENTS] = set()
+    CORE.data[KEY_ESP32][KEY_FULL_CERT_BUNDLE] = False
+    CORE.data[KEY_ESP32][KEY_MBEDTLS_PEER_CERT_REQUIRED] = False
+    CORE.data[KEY_ESP32][KEY_MBEDTLS_PKCS7_REQUIRED] = False
+    CORE.data[KEY_ESP32][KEY_FATFS_REQUIRED] = False
 
     return config
 
 
 KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED = "usb_serial_jtag_secondary_required"
 KEY_VFS_TERMIOS_REQUIRED = "vfs_termios_required"
+KEY_VFS_SELECT_REQUIRED = "vfs_select_required"
+KEY_VFS_DIR_REQUIRED = "vfs_dir_required"
+KEY_MBEDTLS_PEER_CERT_REQUIRED = "mbedtls_peer_cert_required"
+KEY_MBEDTLS_PKCS7_REQUIRED = "mbedtls_pkcs7_required"
+KEY_FATFS_REQUIRED = "fatfs_required"
 
 
 def get_esp32_variant(core_obj=None):
@@ -191,6 +203,16 @@ def get_board(core_obj=None):
     return (core_obj or CORE).data[KEY_ESP32][KEY_BOARD]
 
 
+def exclude_builtin_idf_component(name: str) -> None:
+    """Add an ESP-IDF component to the exclusion list."""
+    CORE.data[KEY_ESP32][KEY_EXCLUDE_COMPONENTS].add(name)
+
+
+def include_builtin_idf_component(name: str) -> None:
+    """Remove an ESP-IDF component from the exclusion list."""
+    CORE.data[KEY_ESP32][KEY_EXCLUDE_COMPONENTS].discard(name)
+
+
 def require_usb_serial_jtag_secondary() -> None:
     """Mark that USB Serial/JTAG secondary console is required by a component."""
     CORE.data[KEY_ESP32][KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED] = True
@@ -199,6 +221,36 @@ def require_usb_serial_jtag_secondary() -> None:
 def require_vfs_termios() -> None:
     """Mark that VFS termios support is required by a component."""
     CORE.data[KEY_VFS_TERMIOS_REQUIRED] = True
+
+
+def require_vfs_select() -> None:
+    """Mark that VFS select support is required by a component."""
+    CORE.data[KEY_VFS_SELECT_REQUIRED] = True
+
+
+def require_vfs_dir() -> None:
+    """Mark that VFS directory support is required by a component."""
+    CORE.data[KEY_VFS_DIR_REQUIRED] = True
+
+
+def require_full_certificate_bundle() -> None:
+    """Mark that the full mbedTLS certificate bundle is required."""
+    CORE.data[KEY_ESP32][KEY_FULL_CERT_BUNDLE] = True
+
+
+def require_mbedtls_peer_cert() -> None:
+    """Mark that mbedTLS peer certificate retention is required."""
+    CORE.data[KEY_ESP32][KEY_MBEDTLS_PEER_CERT_REQUIRED] = True
+
+
+def require_mbedtls_pkcs7() -> None:
+    """Mark that mbedTLS PKCS#7 support is required."""
+    CORE.data[KEY_ESP32][KEY_MBEDTLS_PKCS7_REQUIRED] = True
+
+
+def require_fatfs() -> None:
+    """Mark that FATFS support is required by a component."""
+    CORE.data[KEY_ESP32][KEY_FATFS_REQUIRED] = True
 
 
 def get_download_types(storage_json):
