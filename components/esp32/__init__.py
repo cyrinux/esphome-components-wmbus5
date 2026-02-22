@@ -174,8 +174,13 @@ def set_core_data(config):
     CORE.data[KEY_ESP32][KEY_BOARD] = config[CONF_BOARD]
     CORE.data[KEY_ESP32][KEY_VARIANT] = variant
     CORE.data[KEY_ESP32][KEY_EXTRA_BUILD_FILES] = {}
+    CORE.data[KEY_ESP32][KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED] = False
 
     return config
+
+
+KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED = "usb_serial_jtag_secondary_required"
+KEY_VFS_TERMIOS_REQUIRED = "vfs_termios_required"
 
 
 def get_esp32_variant(core_obj=None):
@@ -184,6 +189,16 @@ def get_esp32_variant(core_obj=None):
 
 def get_board(core_obj=None):
     return (core_obj or CORE).data[KEY_ESP32][KEY_BOARD]
+
+
+def require_usb_serial_jtag_secondary() -> None:
+    """Mark that USB Serial/JTAG secondary console is required by a component."""
+    CORE.data[KEY_ESP32][KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED] = True
+
+
+def require_vfs_termios() -> None:
+    """Mark that VFS termios support is required by a component."""
+    CORE.data[KEY_VFS_TERMIOS_REQUIRED] = True
 
 
 def get_download_types(storage_json):
@@ -891,6 +906,9 @@ async def to_code(config):
             f"VERSION_CODE({framework_ver.major}, {framework_ver.minor}, {framework_ver.patch})"
         ),
     )
+
+    if CORE.data[KEY_ESP32].get(KEY_USB_SERIAL_JTAG_SECONDARY_REQUIRED, False):
+        add_idf_sdkconfig_option("CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG", True)
 
     add_idf_sdkconfig_option(f"CONFIG_LOG_DEFAULT_LEVEL_{conf[CONF_LOG_LEVEL]}", True)
 
